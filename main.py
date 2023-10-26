@@ -74,6 +74,7 @@ def exec_bash_script(location):
     # Change back
     os.chdir(wd)
     if r.returncode == 1:
+        print("Something went wrong with the bash script. Check your country code. Raising error:")
         raise SyntaxError(r.stdout)
     elif r.returncode == 0:
         return r.stdout
