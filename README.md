@@ -1,7 +1,7 @@
 # Auto Connect NordVPN via OpenVPN
 
 A python script that automatically connects to a random nordVPN server with the openVPN CLI. 
-Set up the project and then to run, clone the repo and then execute ```python3 main.pu```
+Set up the project and then to run, clone the repo and then execute ```python3 main.py```
 
 This script extends from the bash script by Mattia Tezzele that finds the closes nordVPN server: https://github.com/mrzool/nordvpn-server-find.git
 
@@ -37,5 +37,5 @@ Copy your credentials
 
 
 ## Additional notes
-The original intent for this repo was to be deployed to linux server such as ubuntu and debian servers. 
+The original intent for this repo was to be deployed to linux servers such as ubuntu and debian servers. 
 This script would then be run at specified time intervals using cron to constantly change the ip/location of the server.
