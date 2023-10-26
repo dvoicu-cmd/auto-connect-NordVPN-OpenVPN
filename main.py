@@ -73,9 +73,8 @@ def exec_bash_script(location):
 
     # Change back
     os.chdir(wd)
-
     if r.returncode == 1:
-        raise SyntaxError("Improper country code")
+        raise SyntaxError(r.stdout)
     elif r.returncode == 0:
         return r.stdout
     else:
@@ -118,7 +117,12 @@ def download(url):
     Sends a request to download from a download link using python requests
     """
     req = requests.get(url, allow_redirects=True)
-    open('saved-config-file/config.ovpn', 'wb').write(req.content)
+    try:
+        open('saved-config-file/config.ovpn', 'wb').write(req.content)
+    except: # If the file does not exist create it
+        open('saved-config-file/config.ovpn', 'x')
+        open('saved-config-file/config.ovpn', 'wb').write(req.content)
+
     return 0
 
 
