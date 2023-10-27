@@ -30,10 +30,12 @@ def main():
 
     # -------------- KILL DAEMON -------------- #
     # Before starting the download, for safe measure, kill any running openvpn daemon
-
+    print("Killing openVPN daemon")
+    exec_start_stop_daemon(None,None, False)
 
 
     # -------------- DOWNLOAD THE OVPN FILE -------------- #
+    print('\n')
     print("Downloading random ovpn config")
 
     # First execute the bash script
@@ -51,7 +53,7 @@ def main():
 
     # Fourth, get the link for the download address
     i = random.randrange(0, 19)
-    url = ""
+    url = None
     try:
         url = get_download_link(vpn_server_addresses[i], protocol)
     except IndexError:  # Just in case my fix does not work for the bash script
@@ -66,6 +68,9 @@ def main():
     # -------------- APPLY THE OVPN CONFIG FILE -------------- #
     print('\n')
     print("Starting openvpn daemon")
+
+    # Exec script
+    exec_start_stop_daemon(nord_user, nord_pass, True)
 
     return 0
 
@@ -87,8 +92,10 @@ def exec_server_find(location):
     # Run Script
     r = subprocess.run(['./nordvpn-server-find.sh', '-l', location], capture_output=True)
 
-    # Change back
+    # Change back working dir
     os.chdir(wd)
+
+    # Check codes
     if r.returncode == 1:
         print("Something went wrong with the bash script. Check your country code. Raising error:")
         raise SyntaxError(r.stderr)
@@ -96,6 +103,36 @@ def exec_server_find(location):
         return r.stdout
     else:
         return "That ain't right"
+
+
+def exec_start_stop_daemon(user, paswd, to_start):
+    # Set up file path
+    wd = os.getcwd()
+    bd = "/start-stop-OpenVPN" # bd -> bash directory
+    bd = wd + bd
+
+    # Change dir
+    os.chdir(bd)
+
+    # Run script
+    script = None
+    r = None
+    if to_start:
+        script = './start-openVPN.sh'
+        r = subprocess.run([script, user, paswd])
+        if r.returncode == 1:
+            print("Something went wrong starting the daemon")
+            raise BrokenPipeError(r.stderr)
+    else:
+        script = './stop-openVPN.sh'
+        r = subprocess.run([script])
+        if r.returncode == 1:
+            print("Something went wrong stopping the daemon")
+            raise BrokenPipeError(r.stderr)
+
+    # Change dir back and return
+    os.chdir(wd)
+    return 0
 
 
 # ---- Web Requests ---- #
