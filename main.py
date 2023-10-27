@@ -14,21 +14,34 @@ def main():
     if not file:
         raise Exception('Failed to read config file')
 
+    # ---------------------------------------------------- #
     country_code = config.get('CONFIG', 'country')
-    country_code = country_code.strip('\'\"')
+    country_code = strip_quotes(country_code)
 
     protocol = config.get('CONFIG', 'protocol')
-    protocol = protocol.strip('\'\"')
+    protocol = strip_quotes(protocol)
 
-    # --- DOWNLOAD THE OVPN FILE --- #
-    print("downloading random ovpn config")
+    nord_user = config.get('CONFIG', 'nord_user')
+    nord_user = strip_quotes(nord_user)
+
+    nord_pass = config.get('CONFIG','nord_pass')
+    nord_pass = strip_quotes(nord_pass)
+    # ---------------------------------------------------- #
+
+    # -------------- KILL DAEMON -------------- #
+    # Before starting the download, for safe measure, kill any running openvpn daemon
+
+
+
+    # -------------- DOWNLOAD THE OVPN FILE -------------- #
+    print("Downloading random ovpn config")
 
     # First execute the bash script
-    script_result = exec_bash_script(country_code)
+    script_result = exec_server_find(country_code)
     # There is an error where the script won't catch the results correctly.
     # This results in an output string with no characters. If this happens just re-run
     while script_result.__len__() <= 0:
-        script_result = exec_bash_script(country_code)
+        script_result = exec_server_find(country_code)
 
     # Second, put result into a list
     vpn_server_addresses = vpn_list(script_result)
@@ -50,17 +63,20 @@ def main():
     # Done
     print("Downloaded ovpn server config for: " + vpn_server_addresses[i])
 
-    # --- APPLY THE OVPN CONFIG FILE --- #
-
-
-
+    # -------------- APPLY THE OVPN CONFIG FILE -------------- #
+    print('\n')
+    print("Starting openvpn daemon")
 
     return 0
 
 
-def exec_bash_script(location):
+# ---------------- Functions ---------------- #
+
+# ---- Bash execs --- #
+# Functions involving a shell script
+def exec_server_find(location):
     """
-    Executes the bash script for finding a nordvpn server address
+    Executes the bash script for finding a nordVPN server address
     """
     # First change working dir
     wd = os.getcwd()
@@ -75,21 +91,15 @@ def exec_bash_script(location):
     os.chdir(wd)
     if r.returncode == 1:
         print("Something went wrong with the bash script. Check your country code. Raising error:")
-        raise SyntaxError(r.stdout)
+        raise SyntaxError(r.stderr)
     elif r.returncode == 0:
         return r.stdout
     else:
         return "That ain't right"
 
 
-def vpn_list(result):
-    """
-    Makes a python list of the vpn servers found
-    """
-    decompile = result.decode()
-    output = re.findall(r"([a-z]{2}[0-9]+\.nordvpn\.com)", decompile) # This regex finds the server address
-    return output
-
+# ---- Web Requests ---- #
+# Functions involving a web request
 
 def get_download_link(link, protocol):
     """
@@ -123,8 +133,25 @@ def download(url):
     except: # If the file does not exist create it
         open('saved-config-file/config.ovpn', 'x')
         open('saved-config-file/config.ovpn', 'wb').write(req.content)
-
     return 0
+
+# ---- Formatting ---- #
+# Functions involving formatting a string or data structure
+
+def vpn_list(result):
+    """
+    Makes a python list of the vpn servers found
+    """
+    decompile = result.decode()
+    output = re.findall(r"([a-z]{2}[0-9]+\.nordvpn\.com)", decompile) # This regex finds the server address
+    return output
+
+
+def strip_quotes(str):
+    """
+    Strips ' and " characters from string
+    """
+    return str.strip('\'\"')
 
 
 # Execute python code
