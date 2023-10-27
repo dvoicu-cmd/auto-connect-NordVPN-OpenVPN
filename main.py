@@ -72,7 +72,7 @@ def main():
 
     print("python3: Init starting daemon")
     # Exec script
-    exec_start_daemon(nord_user, nord_pass, True)
+    exec_start_daemon(nord_user, nord_pass)
 
     return 0
 
@@ -93,8 +93,6 @@ def exec_server_find(location):
 
     # Run Script
     print("python3: Start subprocess \n")
-    out = execute(['./nordvpn-server-find.sh', '-l', location])
-    print(out)
     r = subprocess.run(['./nordvpn-server-find.sh', '-l', location], capture_output=True)
 
     # Change back working dir
@@ -148,26 +146,6 @@ def exec_stop_daemon():
     os.chdir(wd)
 
     return 0
-
-
-def execute(command):
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    output = ''
-
-    # Poll process for new output until finished
-    for line in iter(process.stdout.readline, ""):
-        print(line)
-        output += line
-
-    process.wait()
-    exitCode = process.returncode
-
-    if (exitCode == 0):
-        return output
-    else:
-        raise Exception(command, exitCode, output)
-
-execute(['ping', 'localhost'])
 
 # ---- Web Requests ---- #
 # Functions involving a web request
