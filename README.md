@@ -1,14 +1,14 @@
 # Auto Connect NordVPN via OpenVPN
 
-A python script that automatically connects to a random nordVPN server with the openVPN CLI. 
-Set up the project and then to run, clone the repo and then execute ```python3 main.py```
+A python script that automatically connects to a random nordVPN server using the openVPN tunnel daemon. 
+Simply clone the repo, set up your configurations and then execute with privileged access ```python3 main.py``` 
 
 This script extends from the bash script by Mattia Tezzele that finds the closes nordVPN server: https://github.com/mrzool/nordvpn-server-find.git
 
 ## Set up
 ### Dependencies
 
-This script depends on the openvpn cli tool to run. The bash script for finding servers depends on jq and requires bash4 to run.
+This python script depends on the openvpn daemon tool to run. The bash script for finding servers depends on jq and requires bash4 to run.
 ```text
 sudo apt install openvpn
 sudo apt install jq
@@ -40,13 +40,26 @@ Copy your credentials
 The original intent for this repo was to be deployed to linux servers such as ubuntu and debian servers. 
 This script would then be run at specified time intervals using cron to constantly change the ip/location of the server.
 
-## Example
+### Example
 
 Here is how the script should look when ran:
 ![sequence image](./img/sequence.png)
 
 Verify that your vpn connection has been established with ```ipconfig``` or ```ip address```.
-There should be a new tunnel ```tun0```
+There should be a new tunnel called ```tun0``` with a new ipv4 address.
 ![tun0 image](./img/tun0.png)
 
 You can also check if the openvpn process is running by using: ```ps ax``` 
+
+### Running as cron job
+cron is a command line tool used for job scheduling. It can be used to schedule executions of this script.
+To get started, edit the cron tab
+```text
+crontab -e
+```
+Then, add the timing of executing the script, the file location of your python3 installation, and the location of the main.py. 
+
+For example, the line below should run the script every minute:
+```
+* * * * * /usr/bin/python3 /root/auto-connect-NordVPN-OpenVPN/main.py
+```
