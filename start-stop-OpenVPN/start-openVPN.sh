@@ -10,10 +10,10 @@ VPN_USER=$1
 VPN_PASSWORD=$2
 
 # Do a quick check and notify user
-if [ -z "$VPN_USER"]; then
+if [ -z "$VPN_USER" ]; then
   echo VPN_USER param is empty
 fi
-if [ -z "$VPN_PASSWORD"]; then
+if [ -z "$VPN_PASSWORD" ]; then
   echo VPN_PASSWORD param is empty
 fi
 
