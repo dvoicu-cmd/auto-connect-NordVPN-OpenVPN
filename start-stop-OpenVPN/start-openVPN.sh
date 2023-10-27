@@ -2,7 +2,6 @@
 
 if command -v openvpn >/dev/null 2>&1 ; then
   echo "openvpn found"
-  echo "version: $(openvpn -v)"
 else
   echo "openvpn is not installed"
   exit 1

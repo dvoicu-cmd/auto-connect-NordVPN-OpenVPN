@@ -139,7 +139,7 @@ def exec_stop_daemon():
     # Change dir
     os.chdir(bd)
 
-    r = subprocess.run(['./stop-openVPN.sh'], capture_output=True)
+    r = subprocess.run(['./stop-openVPN.sh'], capture_output=True, shell=True)
     if r.returncode == 1:
         print("Something went wrong stopping the daemon")
         raise BrokenPipeError(r.stderr)
