@@ -19,10 +19,10 @@ sudo apt install bash4
 To set config paramaters for the script, in the root directory of the repository, create a file titled ```server_target.cfg``` with the following contents:
 ```text
 [CONFIG]
-country='' # two character country code
-protocol='' # udp or tcp
-nord_user='' # nord manual username string
-nord_pass='' # nord manual password string
+country='{two character country code}'
+protocol='{udp or tcp}'
+nord_user='{nord manual username string}'
+nord_pass='{nord manual password string}'
 ```
 Replace the string values with your desired parameters in the config.
 
@@ -39,3 +39,14 @@ Copy your credentials
 ## Additional notes
 The original intent for this repo was to be deployed to linux servers such as ubuntu and debian servers. 
 This script would then be run at specified time intervals using cron to constantly change the ip/location of the server.
+
+## Example
+
+Here is how the script should look when ran:
+![sequence image](./img/sequence.png)
+
+Verify that your vpn connection has been established with ```ipconfig``` or ```ip address```.
+There should be a new tunnel ```tun0```
+![tun0 image](./img/tun0.png)
+
+You can also check if the openvpn process is running by using: ```ps ax``` 
