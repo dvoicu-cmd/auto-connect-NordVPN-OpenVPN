@@ -30,13 +30,13 @@ def main():
 
     # -------------- KILL DAEMON -------------- #
     # Before starting the download, for safe measure, kill any running openvpn daemon
-    print("Killing openVPN daemon")
+    print("python3: Init killing openVPN daemon")
     exec_start_stop_daemon(None,None, False)
 
 
     # -------------- DOWNLOAD THE OVPN FILE -------------- #
     print('\n')
-    print("Downloading random ovpn config")
+    print("python3: Downloading random ovpn config")
 
     # First execute the bash script
     script_result = exec_server_find(country_code)
@@ -63,12 +63,12 @@ def main():
     download(url)
 
     # Done
-    print("Downloaded ovpn server config for: " + vpn_server_addresses[i])
+    print("python3: Downloaded ovpn server config for: " + vpn_server_addresses[i])
 
     # -------------- APPLY THE OVPN CONFIG FILE -------------- #
     print('\n')
-    print("Starting openvpn daemon")
 
+    print("python3: Init starting daemon")
     # Exec script
     exec_start_stop_daemon(nord_user, nord_pass, True)
 
@@ -108,7 +108,7 @@ def exec_server_find(location):
 def exec_start_stop_daemon(user, paswd, to_start):
     # Set up file path
     wd = os.getcwd()
-    bd = "/start-stop-OpenVPN" # bd -> bash directory
+    bd = "/start-stop-OpenVPN"  # bd -> bash directory
     bd = wd + bd
 
     # Change dir

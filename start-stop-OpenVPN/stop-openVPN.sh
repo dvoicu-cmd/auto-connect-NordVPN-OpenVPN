@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo stopping openVPN daemon
+echo Killing openVPN daemon
 # Kill the openvpn daemon
 pkill openvpn
-echo daemon killed
+echo Daemon killed
