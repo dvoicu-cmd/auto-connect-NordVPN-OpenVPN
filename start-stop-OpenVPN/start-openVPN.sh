@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+if command -v openvpn >/dev/null 2>&1 ; then
+  echo "openvpn found"
+  echo "version: $(openvpn -v)"
+else
+  echo "openvpn is not installed"
+  exit 1
+fi
+
 # navigate to config file location in repo
 echo Starting openVPN daemon
 cd ..
