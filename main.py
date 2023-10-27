@@ -31,7 +31,7 @@ def main():
     # -------------- KILL DAEMON -------------- #
     # Before starting the download, for safe measure, kill any running openvpn daemon
     print("python3: Init killing openVPN daemon")
-    exec_start_stop_daemon(None,None, False)
+    exec_stop_daemon()
 
 
     # -------------- DOWNLOAD THE OVPN FILE -------------- #
@@ -72,7 +72,7 @@ def main():
 
     print("python3: Init starting daemon")
     # Exec script
-    exec_start_stop_daemon(nord_user, nord_pass, True)
+    exec_start_daemon(nord_user, nord_pass, True)
 
     return 0
 
@@ -110,7 +110,7 @@ def exec_server_find(location):
         return "That ain't right"
 
 
-def exec_start_stop_daemon(user, paswd, to_start):
+def exec_start_daemon(user, paswd):
     # Set up file path
     wd = os.getcwd()
     bd = "/start-stop-OpenVPN"  # bd -> bash directory
@@ -120,25 +120,34 @@ def exec_start_stop_daemon(user, paswd, to_start):
     os.chdir(bd)
 
     # Run script
-    script = None
-    r = None
-    if to_start:
-        script = './start-openVPN.sh'
-        r = subprocess.run([script, user, paswd])
-        if r.returncode == 1:
-            print("Something went wrong starting the daemon")
-            raise BrokenPipeError(r.stderr)
-    else:
-        script = './stop-openVPN.sh'
-        r = subprocess.run([script])
-        if r.returncode == 1:
-            print("Something went wrong stopping the daemon")
-            raise BrokenPipeError(r.stderr)
+    r = subprocess.run(['./start-openVPN.sh', user, paswd])
+    if r.returncode == 1:
+        print("Something went wrong starting the daemon")
+        raise BrokenPipeError(r.stderr)
 
     # Change dir back and return
     os.chdir(wd)
     return 0
 
+
+def exec_stop_daemon():
+    # Set up file path
+    wd = os.getcwd()
+    bd = "/start-stop-OpenVPN"  # bd -> bash directory
+    bd = wd + bd
+
+    # Change dir
+    os.chdir(bd)
+
+    r = subprocess.run(['./stop-openVPN.sh'], capture_output=True)
+    if r.returncode == 1:
+        print("Something went wrong stopping the daemon")
+        raise BrokenPipeError(r.stderr)
+
+    # Change dir back and return
+    os.chdir(wd)
+
+    return 0
 
 
 def execute(command):
