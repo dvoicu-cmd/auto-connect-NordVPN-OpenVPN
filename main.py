@@ -43,7 +43,9 @@ def main():
     # There is an error where the script won't catch the results correctly.
     # This results in an output string with no characters. If this happens just re-run
     while script_result.__len__() <= 0:
+        print("python3: FAILOVER")
         script_result = exec_server_find(country_code)
+    print("python3: Found")
 
     # Second, put result into a list
     vpn_server_addresses = vpn_list(script_result)
@@ -90,6 +92,7 @@ def exec_server_find(location):
     os.chdir(bd)
 
     # Run Script
+    print("python3: Start subprocess")
     r = subprocess.run(['./nordvpn-server-find.sh', '-l', location], capture_output=True)
 
     # Change back working dir

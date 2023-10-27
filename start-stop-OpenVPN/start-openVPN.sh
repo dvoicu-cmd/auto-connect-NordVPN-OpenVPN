@@ -3,7 +3,6 @@
 # navigate to config file location in repo
 echo Starting openVPN daemon
 cd ..
-cd saved-config-file
 
 # arg $1 -> username, arg $2 -> password
 VPN_USER=$1
@@ -18,5 +17,9 @@ if [ -z "$VPN_PASSWORD" ]; then
 fi
 
 # start openvpn daemon with the config file
-openvpn --auth-user-pass --daemon --config config.ovpn --auth-user-pass <(echo -e "$VPN_USER\n$VPN_PASSWORD")
+openvpn --auth-user-pass --daemon --config saved-config-file/config.ovpn --auth-user-pass <(echo -e "$VPN_USER\n$VPN_PASSWORD")
 echo Started given the credentials in server_target.cfg
+
+# return directory
+cd start-stop-OpenVPN/
+pwd
