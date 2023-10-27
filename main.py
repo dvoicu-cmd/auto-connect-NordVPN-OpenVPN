@@ -31,7 +31,7 @@ def main():
     # -------------- KILL DAEMON -------------- #
     # Before starting the download, for safe measure, kill any running openvpn daemon
     print("python3: Init killing openVPN daemon")
-    exec_stop_daemon()
+    # exec_stop_daemon()
 
 
     # -------------- DOWNLOAD THE OVPN FILE -------------- #
@@ -40,11 +40,13 @@ def main():
 
     # First execute the bash script
     script_result = exec_server_find(country_code)
+
     # There is an error where the script won't catch the results correctly.
     # This results in an output string with no characters. If this happens just re-run
     while script_result.__len__() <= 0:
         print("python3: FAILOVER")
         script_result = exec_server_find(country_code)
+
     print("python3: Found")
 
     # Second, put result into a list
@@ -93,7 +95,7 @@ def exec_server_find(location):
 
     # Run Script
     print("python3: Start subprocess \n")
-    r = subprocess.run(['./nordvpn-server-find.sh', '-l', location], capture_output=True)
+    r = subprocess.run(['./nordvpn-server-find.sh', '-l', location], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     # Change back working dir
     os.chdir(wd)
@@ -103,7 +105,7 @@ def exec_server_find(location):
         print("Something went wrong with the bash script. Check your country code. Raising error:")
         raise SyntaxError(r.stderr)
     elif r.returncode == 0:
-        return r.stdout
+        return r.stdout.decode('utf-8')
     else:
         return "That ain't right"
 
@@ -190,9 +192,9 @@ def download(url):
 def vpn_list(result):
     """
     Makes a python list of the vpn servers found
+    arg: result is to be a string
     """
-    decompile = result.decode()
-    output = re.findall(r"([a-z]{2}[0-9]+\.nordvpn\.com)", decompile) # This regex finds the server address
+    output = re.findall(r"([a-z]{2}[0-9]+\.nordvpn\.com)", result)  # This regex finds the server address
     return output
 
 
