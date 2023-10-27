@@ -12,7 +12,7 @@ def main():
     config = configparser.ConfigParser()
     file = config.read('server_target.cfg')
     if not file:
-        raise Exception('Failed to read config file')
+        raise Exception('python3: Failed to read config file')
 
     # ---------------------------------------------------- #
     country_code = config.get('CONFIG', 'country')
@@ -31,7 +31,7 @@ def main():
     # -------------- KILL DAEMON -------------- #
     # Before starting the download, for safe measure, kill any running openvpn daemon
     print("python3: Init killing openVPN daemon")
-    # exec_stop_daemon()
+    exec_stop_daemon()
 
 
     # -------------- DOWNLOAD THE OVPN FILE -------------- #
@@ -61,7 +61,7 @@ def main():
     try:
         url = get_download_link(vpn_server_addresses[i], protocol)
     except IndexError:  # Just in case my fix does not work for the bash script
-        print("nordvpn-server-find failed to respond")
+        print("python3: nordvpn-server-find failed to respond")
 
     # Finally download the ovpn config file
     download(url)
@@ -71,7 +71,6 @@ def main():
 
     # -------------- APPLY THE OVPN CONFIG FILE -------------- #
     print('\n')
-
     print("python3: Init starting daemon")
     # Exec script
     exec_start_daemon(nord_user, nord_pass)
@@ -95,17 +94,22 @@ def exec_server_find(location):
 
     # Run Script
     print("python3: Start subprocess \n")
-    r = subprocess.run(['./nordvpn-server-find.sh', '-l', location], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    r = subprocess.run(['./nordvpn-server-find.sh', '-l', location], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
 
     # Change back working dir
     os.chdir(wd)
 
     # Check codes
     if r.returncode == 1:
-        print("Something went wrong with the bash script. Check your country code. Raising error:")
+        print("python3: Something went wrong with the bash script. Check your country code. Raising error:")
         raise SyntaxError(r.stderr)
     elif r.returncode == 0:
-        return r.stdout.decode('utf-8')
+        out = r.stdout.decode('utf-8')
+
+        print('\n')
+        print("BASH ./nordvpn-server-find-master.sh: \n"+ out)
+
+        return out
     else:
         return "That ain't right"
 
@@ -120,13 +124,17 @@ def exec_start_daemon(user, paswd):
     os.chdir(bd)
 
     # Run script
-    r = subprocess.run(['./start-openVPN.sh', user, paswd])
+    r = subprocess.run(['./start-openVPN.sh', user, paswd], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     if r.returncode == 1:
-        print("Something went wrong starting the daemon")
-        raise BrokenPipeError(r.stderr)
+        print("python3: Something went wrong starting the daemon. Is openvpn installed?")
+        raise BrokenPipeError("script exited with returncode 1")
 
     # Change dir back and return
     os.chdir(wd)
+
+    print('\n')
+    print("BASH ./start-openVPN.sh: \n"+r.stdout.decode('utf-8'))
+
     return 0
 
 
@@ -139,18 +147,22 @@ def exec_stop_daemon():
     # Change dir
     os.chdir(bd)
 
-    r = subprocess.run(['./stop-openVPN.sh'], capture_output=True, shell=True)
+    r = subprocess.run(['./stop-openVPN.sh'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     if r.returncode == 1:
-        print("Something went wrong stopping the daemon")
-        raise BrokenPipeError(r.stderr)
+        print("python3: Something went wrong stopping the daemon. Is openvpn installed?")
+        raise BrokenPipeError("script exited with returncode 1")
 
     # Change dir back and return
     os.chdir(wd)
+
+    print('\n')
+    print("BASH ./stop-OpenVPN.sh: \n"+ r.stdout.decode('utf-8'))
 
     return 0
 
 # ---- Web Requests ---- #
 # Functions involving a web request
+
 
 def get_download_link(link, protocol):
     """
@@ -164,7 +176,7 @@ def get_download_link(link, protocol):
     elif protocol.__eq__('tcp'):
         search = search + '.tcp443.ovpn'
     else:
-        raise SyntaxError("invalid input for the protocol: input \'tcp\' or \'udp\'")
+        raise SyntaxError("python3: invalid input for the protocol: input \'tcp\' or \'udp\'")
 
     # hard code the server dir
     servers_dir = "https://downloads.nordcdn.com/configs/files/ovpn_legacy/servers/"
