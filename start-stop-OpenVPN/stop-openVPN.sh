@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
 # Kill the openvpn daemon
-ps ax | grep 'openvpn' | awk -F ' ' '{print $1}' | xargs sudo kill -9
-echo process killed
+pid=$(pgrep -x openvpn)
+
+# Check if the process is running.
+if [[ -n $pid ]]; then
+  # Kill the process.
+  kill -9 $pid
+  echo "Process killed successfully."
+else
+  echo "Process is not running."
+fi
+
 exit 0
