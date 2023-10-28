@@ -14,7 +14,7 @@ Wants=autoConnectVPN.timer
 [Service]
 Type=simple
 User=root
-ExecStart=/{path of python3} /{file path of main.py
+ExecStart=/{path of python3} /{file path of main.py}
 WorkingDirectory=/{repository working directory file path}
 KillMode=process
 

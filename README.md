@@ -16,7 +16,12 @@ sudo apt install bash4
 ```
 
 ### Setting Configuration Parameters
-To set config paramaters for the script, in the root directory of the repository, create a file titled ```server_target.cfg``` with the following contents:
+To set config paramaters for the script, in the root directory of the repository, create the config file titled ```server_target.cfg``` 
+```commandline
+touch server_target.cfg
+```
+
+Add the following contents to the file:
 ```text
 [CONFIG]
 country='{two character country code}'
@@ -25,6 +30,7 @@ nord_user='{nord manual username string}'
 nord_pass='{nord manual password string}'
 ```
 Replace the string values with your desired parameters in the config.
+
 
 ### Acquiring nordVPN manual credentials
 Visit the nord account dashboard: https://my.nordaccount.com/dashboard/nordvpn/
@@ -51,15 +57,5 @@ There should be a new tunnel called ```tun0``` with a new ipv4 address.
 
 You can also check if the openvpn process is running by using: ```ps ax``` 
 
-### Running as cron job
-cron is a command line tool used for job scheduling. It can be used to schedule executions of this script.
-To get started, edit the cron tab
-```text
-crontab -e
-```
-Then, add the timing of executing the script, the file location of your python3 installation, and the location of the main.py. 
-
-For example, the line below should run the script every minute:
-```
-* * * * * /usr/bin/python3 /root/auto-connect-NordVPN-OpenVPN/main.py
-```
+### Running as a Systemd Service
+Please have a look at the readme file in ```systemd-service-files/```
