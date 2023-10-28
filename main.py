@@ -230,6 +230,5 @@ def strip_quotes(str):
     """
     return str.strip('\'\"')
 
-
 # Execute python code
 main()

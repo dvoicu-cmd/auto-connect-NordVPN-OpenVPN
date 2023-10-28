@@ -3,7 +3,7 @@
 # https://opensource.com/article/20/7/systemd-timers
 
 [Unit]
-Description=Times the
+Description=Times the autoConnectVPN.service
 Requires=autoConnectVPN.service
 
 # Adjust OnCalendar for timing.
