@@ -36,4 +36,7 @@ journalctl
 ```
 
 If you wish to change the frequency of executions for the service, modify the OnCalendar parameter in the timer unit file.
-Further reading: https://opensource.com/article/20/7/systemd-timers
+Further reading: 
+- https://opensource.com/article/20/7/systemd-timers
+- https://wiki.archlinux.org/title/systemd/Timers#As_a_cron_replacement
+- https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#

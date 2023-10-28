@@ -1,15 +1,19 @@
 # Timer unit for the autoConnectVPN service unit
 # You can adjust the run frequency of the script here
+# s -> seconds, min -> minutes, d -> days, w -> weeks, M -> months, y -> years
 # https://opensource.com/article/20/7/systemd-timers
 
 [Unit]
 Description=Times the autoConnectVPN.service
 Requires=autoConnectVPN.service
 
-# Adjust OnCalendar for timing.
+# Adjust parameters for setting the timing of the script.
+# Default, run 30 sec after boot, then every 5 min indefinitely.
 [Timer]
 Unit=autoConnectVPN.service
-OnCalendar=*-*-* *:*:00
+OnBootSec=30s
+OnUnitActiveSec=5min
+#OnCalendar=*-*-* *:*:00
 
 [Install]
 WantedBy=timers.target
