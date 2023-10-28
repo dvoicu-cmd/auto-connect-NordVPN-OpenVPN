@@ -1,5 +1,3 @@
-import signal
-
 import requests
 import subprocess
 import os
@@ -10,13 +8,13 @@ import configparser
 
 # Main function for pulling webpage
 def main():
+    # ------------------ PARSE CONFIG ---------------------- #
     # Before we start, parse the config file
     config = configparser.ConfigParser()
     file = config.read('server_target.cfg')
     if not file:
         raise Exception('python3: Failed to read config file')
 
-    # ---------------------------------------------------- #
     country_code = config.get('CONFIG', 'country')
     country_code = strip_quotes(country_code)
 
@@ -29,11 +27,6 @@ def main():
     nord_pass = config.get('CONFIG','nord_pass')
     nord_pass = strip_quotes(nord_pass)
     # ---------------------------------------------------- #
-
-    # -------------- KILL DAEMON -------------- #
-    # Before starting the download, for safe measure, kill any running openvpn daemon
-    print("python3: Init killing openVPN daemon")
-    exec_stop_daemon()
 
 
     # -------------- DOWNLOAD THE OVPN FILE -------------- #
@@ -71,6 +64,11 @@ def main():
     # Done
     print("python3: Downloaded ovpn server config for: " + vpn_server_addresses[i])
 
+    # -------------- KILL DAEMON -------------- #
+    # Kill any running openvpn daemon before we start a new openvpn daemon
+    print("python3: Init killing openVPN daemon")
+    exec_stop_daemon()
+
     # -------------- APPLY THE OVPN CONFIG FILE -------------- #
     print('\n')
     print("python3: Init starting daemon")
@@ -94,7 +92,7 @@ def exec_server_find(location):
     bd = wd + bd
     os.chdir(bd)
 
-    # Run Script
+    # Run Script, and capture stdout, ignore std error
     print("python3: Start subprocess \n")
     r = subprocess.run(['./nordvpn-server-find.sh', '-l', location], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
 
@@ -103,20 +101,29 @@ def exec_server_find(location):
 
     # Check codes
     if r.returncode == 1:
-        print("python3: Something went wrong with the bash script. Check your country code. Raising error:")
-        raise SyntaxError(r.stderr)
+        raise BrokenPipeError("python3: Something went wrong with the bash script. Check your country code. Raising error:")
     elif r.returncode == 0:
+        # Decode to string
         out = r.stdout.decode('utf-8')
 
+        # Alert user to results of script
         print('\n')
         print("BASH ./nordvpn-server-find-master.sh: \n"+ out)
 
+        # Output the results
         return out
     else:
-        return "That ain't right"
+        # The code block should not be read.
+        raise ProcessLookupError("python3: final else case triggered in exec_server_find() somehow.")
 
 
 def exec_start_daemon(user, paswd):
+    """
+    Sets up and runs the ./start-openVPN.sh bash script to stop openVPN daemons
+    params:
+        user: string value with dVPN username
+        paswd: string value with VPN password
+    """
     # Set up file path
     wd = os.getcwd()
     bd = "/start-stop-OpenVPN"  # bd -> bash directory
@@ -141,6 +148,9 @@ def exec_start_daemon(user, paswd):
 
 
 def exec_stop_daemon():
+    """
+    Sets up and runs the ./stop-openVPN.sh bash script to stop openVPN daemons
+    """
     # Set up file path
     wd = os.getcwd()
     bd = "/start-stop-OpenVPN"  # bd -> bash directory
@@ -149,6 +159,7 @@ def exec_stop_daemon():
     # Change dir
     os.chdir(bd)
 
+    # Run Script, and capture stdout, ignore std error
     r = subprocess.run(['./stop-openVPN.sh'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     if r.returncode == 1:
         print("python3: Something went wrong stopping the daemon. Is openvpn installed?")
@@ -206,7 +217,8 @@ def download(url):
 def vpn_list(result):
     """
     Makes a python list of the vpn servers found
-    arg: result is to be a string
+    arg:
+        result: is to be a string
     """
     output = re.findall(r"([a-z]{2}[0-9]+\.nordvpn\.com)", result)  # This regex finds the server address
     return output
@@ -214,7 +226,7 @@ def vpn_list(result):
 
 def strip_quotes(str):
     """
-    Strips ' and " characters from string
+    Strips ' and " characters from the input string, str
     """
     return str.strip('\'\"')
 
