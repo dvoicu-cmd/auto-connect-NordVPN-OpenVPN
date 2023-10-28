@@ -1,0 +1,22 @@
+# This service unit is used to run the auto-connectVPN script: main.py
+# NOTE: due to the nature of how main.py starts openvpn daemons, this unit needs to specify
+# KillMode=process rather than the default control-group.
+# KillMode=control-group will terminate child processes, including the freshly made openvpn daemon
+# https://stackoverflow.com/questions/32208782/cant-detach-child-process-when-main-process-is-started-from-systemd
+
+[Unit]
+Description=Runs the auto-connectVPN main.py script
+After=multi-user.target
+Conflicts=getty@tty1.service
+Wants=autoConnectVPN.timer
+
+# Specify the file paths below
+[Service]
+Type=simple
+User=root
+ExecStart=/{path of python3} /{file path of main.py
+WorkingDirectory=/{repository working directory file path}
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

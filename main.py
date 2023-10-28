@@ -1,3 +1,5 @@
+import signal
+
 import requests
 import subprocess
 import os
